@@ -27,8 +27,43 @@ class Client:
     @property 
     def identity(self):
         return binascii.hexlify(self._public_key.exportKey(format="DER")).decode("ascii")
+    
+P1 = Client()
+P2 = Client()
+
+class Transaction:
+    # sender _public_key
+    # receiver _public_key
+    # transaction coin value 
+    def __init__(self, sender, receiver, value):
+        self.sender = sender
+        self.receiver = receiver
+        self.value = value
+        self.time = datetime.datetime.now()
+
+    def to_dict(self):
+        if self.sender == "Genesis":
+            identity = "Genesis"
+        else:
+            identity = self.sender.identity
+
+        return collections.OrderedDict({
+            'sender': identity,
+            'receiver': self.receiver,
+            'value': self.value,
+            'time': self.time
+        })
+
+    def sign_transaction(self):
+        private_key = self.sender._private_key
+        signer = PKCS1_v1_5.new(private_key)
+        h = SHA.new(str(self.to_dict()).encode('utf8'))
+        return binascii.hexlify(signer.sign(h)).decode('ascii')
+
+t = Transaction(P1, P2, 50.0)
+
+signature = t.sign_transaction()
+print(signature)
 
 
-eu = Client()
-print(eu.identity)
 
