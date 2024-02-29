@@ -28,8 +28,6 @@ class Client:
     def identity(self):
         return binascii.hexlify(self._public_key.exportKey(format="DER")).decode("ascii")
     
-P1 = Client()
-P2 = Client()
 
 class Transaction:
     # sender _public_key
@@ -60,10 +58,32 @@ class Transaction:
         h = SHA.new(str(self.to_dict()).encode('utf8'))
         return binascii.hexlify(signer.sign(h)).decode('ascii')
 
-t = Transaction(P1, P2, 50.0)
+#############################
+transactions = []
 
-signature = t.sign_transaction()
-print(signature)
+P1 = Client()
+P2 = Client()
+P3 = Client()
+P4 = Client()
+P5 = Client()
 
+t1 = Transaction(P1, P2.identity, 50.0)
+t2 = Transaction(P2, P3.identity, 10.0)
+t3 = Transaction(P3, P4.identity, 50.0)
+t4 = Transaction(P4, P5.identity, 20.0)
+t5 = Transaction(P5, P1.identity, 30.0)
 
+t1.sign_transaction()
+t2.sign_transaction()
+t3.sign_transaction()
+t4.sign_transaction()
+t5.sign_transaction()
+
+transactions.append(t1)
+transactions.append(t2)
+transactions.append(t3)
+transactions.append(t4)
+transactions.append(t5)
+
+print(transactions)
 
